@@ -1,0 +1,20 @@
+{
+  "name": "Odin smart helper",
+  "description" : "To use, type 'g' plus a search term into the url bar.",
+  "version": "1.0",
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "omnibox": { "keyword" : "g" },
+  "manifest_version": 2,
+
+  "browser_action": {
+    "default_icon": "cloud.ico"
+  },
+
+  "applications": {
+    "gecko": {
+      "strict_min_version": "57"
+    }
+  }
+}
