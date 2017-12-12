@@ -1,6 +1,7 @@
 'use strict';
 
-// Originally based on tutorial at https://developer.mozilla.org/en-US/Add-ons/WebExtensions/user_interface/Omnibox
+// Implementation based on tutorial at https://developer.mozilla.org/en-US/Add-ons/WebExtensions/user_interface/Omnibox
+// The idea was taken from plug-in [URL Alias](https://addons.mozilla.org/en-US/firefox/addon/url-alias-8703/) for Firefox
 // FF: open "about:debugging", then "Load Temporary Add-on", select a manifest file
 // Chrome: open "browser://extensions/", check "Developer mode" at top righ corner, click "Load unpacked application"
 
@@ -159,7 +160,7 @@ var omniBar = new OmniBar();
 
 // Provide help text to the user.
 omniBar.OMNIBOX.setDefaultSuggestion({
-  description: "Smart jump to Odin services (e.g. \"g APS-1\" to open Jira issue by ID | \"g rt102332\" to open support ticket #102332). Try type 'g help' and check add-on Options for more"
+  description: "Smart jump to a parameterized URL (try \"g APS-1\" or \"g teDank\"). Type \"g help\" and check add-on Options for more"
 });
 // Update the suggestions whenever the input is changed.
 omniBar.OMNIBOX.onInputChanged.addListener(omniBar.getAllSuggestions.bind(omniBar));

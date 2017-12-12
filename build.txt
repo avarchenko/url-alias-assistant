@@ -1,9 +1,0 @@
-- execute in the "./libs" folder:
-
-http -d https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-http -d https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css
-http -d https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js
-http -d https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js
-
-- zip files:
-zip smart-nav-plugin.zip *.js *.json *.ico *.html libs/*
