@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "URL alias assistant",
   "version": "1.0.3",
-  "description": "To use, type 'g' plus a search term into the url bar. You can customize the existing and add own rules in Settings of the plug-in",
+  "description": "To use, type 'g' plus a search term into the url bar. You can customize the existing and add own rules in Settings of the plug-in.",
   "background": {
     "scripts": [
       "defaultSettings.js",

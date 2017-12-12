@@ -83,13 +83,13 @@ At this moment, a build process is not automated and consists of the following m
 1. Download necessary libraries into the "./libs" folder:
 ```
 cd ./libs/ && rm -f *.js *.cs
-http -d https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
+http -d https://code.jquery.com/jquery-3.2.1.min.js --output jquery.min.js
 http -d https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css
 http -d https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js
 http -d https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js
 ```
 2. Archive necessary files into a zip archive:
 ```
-zip url-alias-assistant-plugin.zip *.js *.json *.ico *.html libs/*
+zip url-alias-assistant-plugin.zip *.js *.json logo96.png logo48.png *.html libs/*
 ```
 3. Submit archive as a new version to [Google Webstore](https://chrome.google.com/webstore/developer/dashboard) and [Mozilla Developer Hub](https://addons.mozilla.org/en-US/developers/addons).
