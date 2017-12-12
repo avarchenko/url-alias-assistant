@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+
+  <body>
+    <div id="Error" style="color: red"></div>
+    <div id="Message" style="color: green"></div>
+    <form id="form">
+        <label>Rules editor<textarea id="settingsJson" cols="160" rows="40" style="font-family: monospace;"></textarea></label>
+        <button id="Save" type="submit">Save</button>
+        <button id="Reset" type="button">Reset to default</button>
+    </form>
+
+    <script src="defaultSettings.js"></script>
+    <script src="options.js"></script>
+
+  </body>
+<!---
+ {
+  "prefix": "ja",
+  "regexp": "([0-9]+)",
+  "suggestions": [
+   {
+    "description": "Open Jira issue APSA-$1",
+    "url": "https://jira.int.zone/browse/APSA-$1"
+   }
+  ]
+ },
+-->
+</html>

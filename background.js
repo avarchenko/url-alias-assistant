@@ -1,176 +1,164 @@
+'use strict';
+
 // Originally based on tutorial at https://developer.mozilla.org/en-US/Add-ons/WebExtensions/user_interface/Omnibox
+// FF: open "about:debugging", then "Load Temporary Add-on", select a manifest file
+// Chrome: open "browser://extensions/", check "Developer mode" at top righ corner, click "Load unpacked application"
 
-const jiraIssueIdRE = /([a-zA-Z]+-[0-9]+)/;
-const numbersRE = /([0-9]+)/;
-
-// to make it working in both Chrome and Firefox:
-var TABS_CREATE, TABS_UPDATE, OMNIBOX, EXTENSION_GETURL;
-setupFunctionAliases();
-
-// Provide help text to the user.
-OMNIBOX.setDefaultSuggestion({
-  description: "Smart jump to Odin services (e.g. \"g APS-1\" to open Jira issue by ID | \"g rt102332\" to open support ticket #102332). Use \"g help\" to get all possible suggestions"
-});
-
-// Update the suggestions whenever the input is changed.
-OMNIBOX.onInputChanged.addListener((guessingText, addSuggestions) => {
-  let suggestions = [];
-  let text = guessingText.trim();
-  let tokens = text.toLowerCase().split(" ");
-
-  let res = text.match(jiraIssueIdRE);
-  if (res !== null) {
-    jiraID = res[1].toUpperCase();
-    // POA-1, APS-1, APSA-1, DO-1 etc:
-    suggestions.push({
-      content: "https://jira.int.zone/browse/" + jiraID,
-      description: "Odin Jira issue #" + jiraID
-    });
-    // CORPIT-1981 and other:
-    suggestions.push({
-      content: "https://cloudteam.atlassian.net/browse/" + jiraID,
-      description: "Cloud Team Jira issue #" + jiraID
-    });
-    // KPN-1 and other:
-    suggestions.push({
-      content: "https://imcloud.atlassian.net/browse/" + jiraID,
-      description: "IM Cloud Jira issue #" + jiraID
-    });
-  }
-
-  // Jira text guesses:
-  const JIRA_SEARCH_PREFIX = "jt";
-  if (text.startsWith(JIRA_SEARCH_PREFIX)) {
-    text = text.slice(JIRA_SEARCH_PREFIX.length).trim(); // cut JIRA_SEARCH_PREFIX at the beginning
-    suggestions.push({
-      content: "https://jira.int.zone/issues/?jql=text~%22"+encodeURIComponent(text.replace("\"", "\\\""))+"%22 ORDER BY created DESC",
-      description: "Search for Jira issues that contain the text '" + text + "'"
-    });
-  }
-
-  // SPConfig stacks guesses:
-  const SPCONFIG_SEARCH_PREFIX = "sp";
-  if (text.startsWith(SPCONFIG_SEARCH_PREFIX)) {
-    text = text.slice(SPCONFIG_SEARCH_PREFIX.length).trim(); // cut SPCONFIG_SEARCH_PREFIX at the beginning
-    suggestions.push({
-      content: "http://spconfig.int.zone:7000/"+text,
-      description: "Open SPConfig stack with name '" + text + "'"
-    });
-  }
-
-  // RT guesses:
-  res = text.match(numbersRE);
-  if (res !== null) {
-    let rtID = res[1];
-    let rtSuggestion = {
-      content: "https://support.odin.com/Ticket/Display.html?id=" + rtID,
-      description: "Support ticket #" + rtID
-    };
-    if (text.startsWith("rt")) {
-      // if prefixed with "rt", make it topmost suggestion
-      suggestions.splice(0, 0, rtSuggestion);
+class OmniBar {
+  constructor() {
+    // to make it working in both Chrome and Firefox:
+    if (typeof browser === "undefined") {
+      this.TABS_CREATE = chrome.tabs.create;
+      this.TABS_UPDATE = chrome.tabs.update;
+      this.OMNIBOX = chrome.omnibox;
+      this.EXTENSION_GETURL = chrome.extension.getURL;
+      this.STORAGE = chrome.storage;
+      // browser = chrome; // hack for Chrome
     } else {
-      // else - just add to bottom
-      suggestions.push(rtSuggestion);
+      this.TABS_CREATE = browser.tabs.create;
+      this.TABS_UPDATE = browser.tabs.update;
+      this.OMNIBOX = browser.omnibox;
+      this.EXTENSION_GETURL = browser.extension.getURL;
+      this.STORAGE = browser.storage;
+    }
+
+    // console.log("Loading settings in constructor");
+    this.STORAGE.local.get(
+      {
+        settings: []
+      }, // default value
+      this.applySettings.bind(this));  // loader
+    // console.log("Leaving the constructor");
+    // console.log(this);
+  }
+
+
+  getAllSuggestions(guessingText, addSuggestions) {
+    let suggestions = [];
+    let text = guessingText.trim();
+
+    this._settings.forEach( (rule) => {
+      let matchedValue = null;
+
+      let prefixMatches = rule.prefix !== "" && text.startsWith(rule.prefix);
+
+      if (rule.regexp !== undefined) {
+        if (rule.regexpObj === undefined) {
+          rule.regexpObj = new RegExp(rule.regexp);
+        }
+
+        let res = text.match(rule.regexpObj);
+        if (res !== null && res.length > 1) {
+          matchedValue = res[1];
+        }
+        if (prefixMatches && matchedValue === null) {
+          matchedValue = "";  // to show the suggestion even if regexp doesn't match
+        }
+      } else if (prefixMatches) {
+        matchedValue = text.slice(rule.prefix.length).trim();
+      }
+
+      if (guessingText === "help")
+        matchedValue = "";
+
+      if (matchedValue !== null) {
+        this.processOneMatch(matchedValue, rule, suggestions)
+      }
+    });
+
+    addSuggestions(suggestions);
+    if (suggestions.length > 0) {
+      this.defaultSuggestion = suggestions[0].content;
+    } else {
+      this.defaultSuggestion = "https://www.google.com/search?q="+encodeURIComponent(guessingText);
     }
   }
 
-  // RT guesses:
-  if (text.startsWith('rt')) {
-    suggestions.splice(0, 0, {
-      content: "https://support.odin.com/",
-      description: "Support ticket portal"
-    });
-  }
 
-  // Git guesses:
-  if (text.startsWith('git')) {
-    suggestions.splice(0, 0, {
-      content: "https://git.int.zone/dashboard",
-      description: "Git Bitbucket repository"
-    }, {
-      content: "https://git.int.zone/projects/AP/repos/osa/browse",
-      description: "Git OA Platform repository (also known as 'Trunk')"
-    }, {
-      content: "https://git.int.zone/projects/AP/repos/automation-7.2/browse",
-      description: "Git Platform fork for OA 7.2 (codename Tawny Eagle)"
-    }, {
-      content: "https://git.int.zone/projects/AP/repos/automation-7.1/browse",
-      description: "Git Platform fork for OA 7.1 (codename Black Eagle)"
-    }, {
-      content: "https://git.int.zone/projects/AP/repos/osa-flamingo/browse",
-      description: "Git Platform fork for OA 7.0 (codename Eagle)"
-    });
-  }
+  processOneMatch(matchedValue, rule, suggestions) {
+    if (rule.options) {
+      if (rule.options.changeCase === 1) {
+        matchedValue = matchedValue.toUpperCase();
+      } else if (rule.options.changeCase === -1) {
+        matchedValue = matchedValue.toLowerCase();
+      }
 
-  // CI guesses:
-  if (text.startsWith('ci')) {
-    suggestions.splice(0, 0, {
-      content: "http://ci.int.zone/jenkins/",
-      description: "Jenkins server"
-    }, {
-      content: "http://ci.ap.int.zone/",
-      description: "AP Jenkins server"
-    }, {
-      content: "http://ci.int.zone/nexus/#welcome",
-      description: "Nexus repository"
-    });
-  }
+      if (rule.options.escapeQuotes === true) {
+        matchedValue = matchedValue.replace(/"/g, "\\\"");
+      }
+    } // options
 
-  // TODO: add guesses for:
-  // - intranet by name
-  // - git PR
-  // - git commit/revision
-  // - jenkins jobs
-  // - stack
-
-  addSuggestions(suggestions);
-});
-
-
-// Open the page based on how the user clicks on a suggestion.
-OMNIBOX.onInputEntered.addListener((text, disposition) => {
-  console.log("Processing '"+text+"' with disposition='"+disposition+"'");
-  // in chrome it passes whole omnibar text, including search prefix "g ", so need to cut it
-  if (text.startsWith('g '))
-    text = text.slice(2);
-
-  let url = text;
-  let validUrlPrefix = /^https?:\/\//i;
-  if (!validUrlPrefix.test(text)) {
-    // Update the url if the user clicks on the default suggestion.
-    // TODO - try to follow the top suggestion if exist
-    url = `https://www.google.ru/search?q=${text}`;
-    if (text === "help") {
-      url = EXTENSION_GETURL("help.html");
+    if (matchedValue !== "" || rule.prefix !== "") {
+      let prefixHint = (rule.prefix === undefined) ? "" : rule.prefix + ": ";
+      rule.suggestions.forEach( (ruleSuggestion) => {
+        suggestions.push({
+          content: ruleSuggestion.url.replace("$1", encodeURIComponent(matchedValue)),
+          description: prefixHint + ruleSuggestion.description.replace(/\$1/g, matchedValue)
+        });
+      });
     }
-    console.log("Failing to Google search");
   }
 
-  switch (disposition) {
-    case "currentTab":
-      TABS_UPDATE({url: url});
-      break;
-    case "newForegroundTab":
-      TABS_CREATE({url: url});
-      break;
-    case "newBackgroundTab":
-      TABS_CREATE({url: url, active: false});
-      break;
-  }
-});
 
-function setupFunctionAliases() {
-  if (typeof browser === "undefined") {
-    TABS_CREATE = chrome.tabs.create;
-    TABS_UPDATE = chrome.tabs.update;
-    OMNIBOX = chrome.omnibox;
-    EXTENSION_GETURL = chrome.extension.getURL
-    // browser = chrome; // hack for Chrome
-  } else {
-    TABS_CREATE = browser.tabs.create;
-    TABS_UPDATE = browser.tabs.update;
-    OMNIBOX = browser.omnibox;
-    EXTENSION_GETURL = browser.extension.getURL
+  // Open the page based on how the user clicks on a suggestion.
+  processUserInput(text, disposition) {
+    console.log("Processing '"+text+"' with disposition='"+disposition+"'");
+
+    let url = text;
+    // in chrome it passes whole omnibar text, including search prefix "g ", so need to cut it
+    if (url.startsWith('g '))
+      url = url.slice(2);
+
+    let validUrlPrefix = /^https?:\/\//i;
+    if (!validUrlPrefix.test(url)) {
+      // Update the url if the user clicks on the default suggestion.
+      url = this.defaultSuggestion;
+    }
+
+    switch (disposition) {
+      case "currentTab":
+        this.TABS_UPDATE({url: url});
+        break;
+      case "newForegroundTab":
+        this.TABS_CREATE({url: url});
+        break;
+      case "newBackgroundTab":
+        this.TABS_CREATE({url: url, active: false});
+        break;
+    }
+  }
+
+  applySettings(newJson) {
+    console.log("Applying New settings:");
+    console.log(newJson);
+    if (newJson) {
+      this._settings = newJson.settings;
+    } else {
+      this._settings = [];
+    }
+  }
+
+  settingsChangedListener(changes, namespace) {
+    for (let key in changes) {
+      let storageChange = changes[key];
+      console.log('Storage key "%s" in namespace "%s" changed. Old value was "%s", new value is "%s".',
+                  key,
+                  namespace,
+                  storageChange.oldValue,
+                  storageChange.newValue);
+      this.applySettings(storageChange.newValue);
+    }
   }
 }
+
+
+var omniBar = new OmniBar();
+
+// Provide help text to the user.
+omniBar.OMNIBOX.setDefaultSuggestion({
+  description: "Smart jump to Odin services (e.g. \"g APS-1\" to open Jira issue by ID | \"g rt102332\" to open support ticket #102332)"
+});
+// Update the suggestions whenever the input is changed.
+omniBar.OMNIBOX.onInputChanged.addListener(omniBar.getAllSuggestions.bind(omniBar));
+omniBar.OMNIBOX.onInputEntered.addListener(omniBar.processUserInput.bind(omniBar));
+omniBar.STORAGE.onChanged.addListener(omniBar.settingsChangedListener.bind(omniBar));
