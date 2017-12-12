@@ -15,7 +15,7 @@ Works both in Google Chrome and Firefox v57+.
 
 Go to plug-in Options page and see the JSON representing the current settings.
 Copy the whole text and paste into your favorite JSON editor.
-Edit the rules as you need and copy-paste them bach into Options page.
+Edit the rules as you need and copy-paste them back into Options page.
 
 ## Format
 
@@ -78,7 +78,7 @@ Here:
 After this rule will be added, you can easily open Jira issue (`DO-1` in this sample) in one of Jira teams just typing `g jDO-1` or even `g jDO-1` in location bar.
 
 # How to build
-At this moment the build is not automated and consist of the following manual steps:
+At this moment, a build process is not automated and consists of the following manual steps:
 
 1. Download necessary libraries into the "./libs" folder:
 ```
