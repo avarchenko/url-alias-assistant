@@ -25,7 +25,7 @@ class OmniBar {
 
     this.STORAGE.local.get(
       {
-        settings: []
+        settings: window.defaultSettings
       }, // default value
       this.applySettings.bind(this));  // loader
   }
@@ -34,6 +34,9 @@ class OmniBar {
   getAllSuggestions(guessingText, addSuggestions) {
     let suggestions = [];
     let text = guessingText.trim();
+    // in chrome sometimes it passes whole omnibar text, including search prefix "g ", so need to cut it
+    while(/^g /i.test(text))
+      text = text.slice(2);
 
     this._settings.forEach( (rule) => {
       let matchedValue = null;
@@ -104,7 +107,7 @@ class OmniBar {
 
     let url = text;
     // in chrome it passes whole omnibar text, including search prefix "g ", so need to cut it
-    if (url.startsWith('g '))
+    while(/^g /i.test(url))
       url = url.slice(2);
 
     let validUrlPrefix = /^https?:\/\//i;

@@ -5,6 +5,7 @@
   "description": "To use, type 'g' plus a search term into the url bar. You can customize the existing and add own rules in Settings of the plug-in",
   "background": {
     "scripts": [
+      "defaultSettings.js",
       "background.js"
     ]
   },
