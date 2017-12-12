@@ -8,11 +8,9 @@ function loadOptions() {
     function(data) {
       document.querySelector("#settingsJson").value = JSON.stringify(data.settings, null, ' ');
     });
-  // getting.then(setCurrentChoice, onError);
 }
 
 function saveOptions(e) {
-  console.log("entered into saveOptions()");
   e.preventDefault();
   let jsonObject;
   try {
@@ -22,22 +20,26 @@ function saveOptions(e) {
     console.log("[ERR] Failed to parse the new settings:");
     console.log(e);
     showError("[ERR] Failed to parse the new settings:\n" + e);
+    return;
   }
   chrome.storage.local.set(
     {
       settings: jsonObject
     },
     function() {
-      showMessageAndHideIt("Changes saved");
+      showMessage("Changes saved");
     }
   );
 }
 
-function showMessageAndHideIt(text) {
+function showMessage(text, closeOptionsPopup) {
   let msg = document.querySelector("#Message");
   msg.textContent = text;
   setTimeout(function() {
     msg.textContent = "";
+    if (closeOptionsPopup === true) {
+      window.close();
+    }
   }, 750);
 }
 
@@ -47,11 +49,28 @@ function showError(text) {
 }
 
 function resetToDefaultOptions() {
-  console.log("Resetting settings with defaults");
-  document.querySelector("#settingsJson").value = JSON.stringify(defaultSettings, null, ' ');
+  bootbox.confirm({
+    message: "Are you sure you want to reset your current rules with a default set?\nYOU WILL LOSE ALL YOUR CHANGES IN THE RULES!!!",
+    buttons: {
+      cancel: {
+        label: 'No',
+        className: 'btn-success'
+      },
+      confirm: {
+        label: 'Yes',
+        className: 'btn-danger'
+      }
+    },
+    callback: function (result) {
+      if (result === true) {
+        console.log("Resetting settings with defaults");
+        document.querySelector("#settingsJson").value = JSON.stringify(defaultSettings, null, ' ');
+      }
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", loadOptions);
 document.querySelector("#form").addEventListener("submit", saveOptions);
-// document.querySelector("#Save").addEventListener("click", saveOptions);
-document.querySelector("#Reset").addEventListener("click", resetToDefaultOptions);
+document.querySelector("#Reset").addEventListener("click", loadOptions);
+document.querySelector("#ResetToDefault").addEventListener("click", resetToDefaultOptions);

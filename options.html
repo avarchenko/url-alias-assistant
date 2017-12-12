@@ -3,31 +3,42 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <!-- CSS dependencies -->
+    <link rel="stylesheet" href="libs/bootstrap.min.css">
+    <!-- JS dependencies -->
+    <script src="libs/jquery.min.js"></script>
+    <script src="libs/bootstrap.min.js"></script>
+    <!-- bootbox code -->
+    <script src="libs/bootbox.min.js"></script>
   </head>
 
   <body>
-    <div id="Error" style="color: red"></div>
-    <div id="Message" style="color: green"></div>
-    <form id="form">
-        <label>Rules editor<textarea id="settingsJson" cols="160" rows="40" style="font-family: monospace;"></textarea></label>
-        <button id="Save" type="submit">Save</button>
-        <button id="Reset" type="button">Reset to default</button>
-    </form>
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div id="Error" style="color: red"></div>
+          <div id="Message" style="color: green"></div>
+          <h4 class="modal-title">Rules editor. For now - use copy-paste into your JSON editor and back.</h4>
+        </div>
+        <form id="form">
+          <div class="modal-body">
+            <textarea id="settingsJson" class="form-control" rows="15" style="font-family: monospace;"></textarea>
+          </div>
+          <div class="modal-footer">
+            <div class="btn-group" role="group">
+              <button id="Reset" type="button" class="btn btn-default">Reset</button>
+            </div>
+            <div class="btn-group" role="group">
+              <button id="Save" type="submit" class="btn btn-primary">Save</button>
+              <button id="ResetToDefault" type="button" class="btn btn-default">Reset to default</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <script src="defaultSettings.js"></script>
     <script src="options.js"></script>
 
   </body>
-<!---
- {
-  "prefix": "ja",
-  "regexp": "([0-9]+)",
-  "suggestions": [
-   {
-    "description": "Open Jira issue APSA-$1",
-    "url": "https://jira.int.zone/browse/APSA-$1"
-   }
-  ]
- },
--->
 </html>

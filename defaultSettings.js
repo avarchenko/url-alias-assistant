@@ -24,6 +24,19 @@ var defaultSettings =
     ]
   },
   {
+    "prefix": "ja",
+    "options": {
+      "changeCase": 1
+    },
+    "suggestions": [
+      {
+        "url": "https://jira.int.zone/browse/APSA-$1",
+        "description": "Odin Jira issue #APSA-$1",
+        "comment": "Internal Odin Jira to open in APSA project"
+      }
+    ]
+  },
+  {
     "prefix": "jt",
     "options": {
       "escapeQuotes": true
@@ -106,4 +119,3 @@ var defaultSettings =
     ]
   }
 ];
-console.log("defaultSettings object created");

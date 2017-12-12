@@ -22,14 +22,11 @@ class OmniBar {
       this.STORAGE = browser.storage;
     }
 
-    // console.log("Loading settings in constructor");
     this.STORAGE.local.get(
       {
         settings: []
       }, // default value
       this.applySettings.bind(this));  // loader
-    // console.log("Leaving the constructor");
-    // console.log(this);
   }
 
 
@@ -129,8 +126,8 @@ class OmniBar {
   }
 
   applySettings(newJson) {
-    console.log("Applying New settings:");
-    console.log(newJson);
+    // console.log("Applying New settings:");
+    // console.log(newJson);
     if (newJson) {
       this._settings = newJson.settings;
     } else {
@@ -139,14 +136,20 @@ class OmniBar {
   }
 
   settingsChangedListener(changes, namespace) {
+    console.log("settingsChangedListener.this=");
+    console.log(this);
     for (let key in changes) {
+      if (key !== "settings")
+        continue;
       let storageChange = changes[key];
       console.log('Storage key "%s" in namespace "%s" changed. Old value was "%s", new value is "%s".',
                   key,
                   namespace,
                   storageChange.oldValue,
                   storageChange.newValue);
-      this.applySettings(storageChange.newValue);
+      this.applySettings({
+        settings: storageChange.newValue
+      });
     }
   }
 }
@@ -156,7 +159,7 @@ var omniBar = new OmniBar();
 
 // Provide help text to the user.
 omniBar.OMNIBOX.setDefaultSuggestion({
-  description: "Smart jump to Odin services (e.g. \"g APS-1\" to open Jira issue by ID | \"g rt102332\" to open support ticket #102332)"
+  description: "Smart jump to Odin services (e.g. \"g APS-1\" to open Jira issue by ID | \"g rt102332\" to open support ticket #102332). Try type 'g help' and check add-on Options for more"
 });
 // Update the suggestions whenever the input is changed.
 omniBar.OMNIBOX.onInputChanged.addListener(omniBar.getAllSuggestions.bind(omniBar));
