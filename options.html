@@ -18,19 +18,92 @@
         <div class="modal-header">
           <div id="Error" style="color: red"></div>
           <div id="Message" style="color: green"></div>
-          <h4 class="modal-title">Rules editor. For now - use copy-paste into your JSON editor and back.</h4>
+          <h4 class="modal-title">Rules editor.</h4>
         </div>
-        <form id="form">
-          <div class="modal-body">
-            <textarea id="settingsJson" class="form-control" rows="15" style="font-family: monospace;"></textarea>
+        <div class="modal-body">
+          <!-- <textarea id="settingsJson" class="form-control" rows="15" style="font-family: monospace;"></textarea> -->
+          <div class="list-group">
+            <button type="button" class="list-group-item" id="rule1">Prefix: <code>te</code></button>
+            <button type="button" class="list-group-item" id="rule2">Regexp: <code>(\d+)</code></button>
+            <button type="button" class="list-group-item" id="rule2">Prefix: <code>rt</code> Regexp: <code>(\d+)</code></button>
+            <div class="row">
+              <div class="col-xs-3">
+                <button type="button" class="btn" id="addRule">+ Add New Rule</button>
+              </div>
+            </div>
+          </div>
+          <form id="form">
+            <div class="row">
+              <div class="col-xs-5">
+                <div class="row">
+                  <div class="col-xs-5">
+                    <div class="form-group">
+                      <label for="prefix">Prefix</label>
+                      <input type="text" class="form-control" id="prefix">
+                    </div>
+                  </div>
+                  <div class="col-xs-7">
+                    <div class="form-group">
+                      <label for="regexp">Regular Expression</label>
+                      <input type="text" class="form-control" id="regexp">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-12">
+                    <div class="form-group">
+                      <label for="regexp">Change Case</label>
+                      <div class="radio">
+                        <label><input type="radio" id="case0" name="case">Don't change</label>
+                        <label><input type="radio" id="case1" name="case">UPPERCASE</label>
+                        <label><input type="radio" id="case2" name="case">lowercase</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-12">
+                    <div class="checkbox">
+                      <label><input type="checkbox" id="escapeQuotes">Escape Double Quotes (replace &quot; with \&quot;)</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xs-7">
+                <div class="row">
+                  <div class="col-xs-12">
+                    <div class="form-group">
+                      <label for="url1">Suggestion #1</label>
+                      <input type="url" class="form-control" id="url1" placeholder="* URL">
+                      <input type="text" class="form-control" id="description1" placeholder="* description">
+                      <input type="text" class="form-control" id="comment1" placeholder="optional free-text comments">
+                    </div>
+                  </div>
+                </div>
+                <!-- <div class="row"><div class="col-xs-12">&nbsp;</div></div> -->
+                <div class="row"><!-- 
+                  <div class="col-xs-12">
+                    <div class="form-group">
+                      <label for="url2">Suggestion #2</label>
+                      <input type="url" class="form-control" id="url2" placeholder="* URL">
+                      <input type="text" class="form-control" id="description2" placeholder="* description">
+                      <input type="text" class="form-control" id="comment2" placeholder="optional free-text comments">
+                    </div>
+                  </div>
+                </div> -->
+              </div>
+            </div>
+
           </div>
           <div class="modal-footer">
-            <div class="btn-group" role="group">
-              <button id="Reset" type="button" class="btn btn-default">Reset</button>
+            <div class="form-group navbar-left">
+              <button type="button" class="btn btn-default" id="exportRules">Export Rules</button>
+              <button type="button" class="btn btn-default" id="importRules">Import Rules</button>
             </div>
             <div class="btn-group" role="group">
               <button id="Save" type="submit" class="btn btn-primary">Save</button>
-              <button id="ResetToDefault" type="button" class="btn btn-default">Reset to default</button>
+              <button id="Reset" type="button" class="btn btn-default">Reset</button>
+              <button id="ResetToDefault" type="button" class="btn btn-default">Reset to Default</button>
             </div>
           </div>
         </form>
