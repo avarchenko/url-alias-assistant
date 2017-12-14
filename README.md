@@ -1,5 +1,6 @@
 # url-alias-assistant
 The addon for Firefox and Chrome browsers which simplifies navigation to frequently used URLs especially if these URLs are ID-based URLs.
+Please read [Native Support in Browsers](#native-support-in-browsers) chapter - maybe you actually don't need this plug-in.
 
 # Purpose
 Originally based on ideas implemented in [URL Alias](https://addons.mozilla.org/en-US/firefox/addon/url-alias-8703/) plug-in for Firefox I've used widely. But the plug-in stopped work after my Firefox was upgraded to v57.
@@ -10,6 +11,30 @@ With the plug-in I just type `g jDO-1` in browser and it navigates me to a prope
 Another case that can't be covered by simple bookmarking: I want to search Jira issues by a text phrase. All I need is type `g jt"error string"` and it will open a search results page like [https://sample.atlassian.net/issues/?jql=text~%22%5C%22error%20string%5C%22%22%20ORDER%20BY%20created%20DESC](https://sample.atlassian.net/issues/?jql=text~%22%5C%22error%20string%5C%22%22%20ORDER%20BY%20created%20DESC)
 
 Works both in Google Chrome and Firefox v57+.
+
+# Native Support in Browsers
+
+After the plug-in was released, I was told there are native ways both in Firefox and Chrome browsers to get the same functionality, so the plug-in became useless for most of scenarios.
+I've put some how-to below. Hope it will help you.
+
+## Chrome
+Open the following [Search Settings](browser://settings/searchEngines) link.
+Here you can see all custom search engines currently registered in your browser (the list is growing automaticaly once you visit a site advertising such custom search support).
+You can customize the list:
+
+- in 1st column put the Hint text to be shown in a list of address bar suggestions. Sample: `GitHub`
+- in 2nd column put the Keyword. It could be a hostname of the site or some shorter string. Sample: `github.com`
+- in 3rd column put the target URL, using "%s" as a placeholder for parameters. Sample: `https://github.com/search?q=%s&ref=opensearch`
+
+
+## Firefox
+Open your bookmarks page (press Ctrl+B).
+Create new bookmark with the following important fields specified:
+
+- Name: `Quick-Search Github`
+- Location: `https://github.com/search?q=%s&ref=opensearch`
+- Keyword: `github.com`
+
 
 # How to Configure
 
@@ -96,4 +121,3 @@ zip url-alias-assistant-plugin.zip *.js *.json logo96.png logo48.png *.html libs
 
 # Obtain Latest Version
 Go to [Firefox Add-ons Site](https://addons.mozilla.org/en-US/firefox/addon/url-alias-assistant/) or [Chrome Web Store](https://chrome.google.com/webstore/detail/url-alias-assistant/mphkengpjhplgaenijfjiagldcnmndeb) to check the latest version and related info.
-
