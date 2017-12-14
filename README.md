@@ -77,7 +77,7 @@ Here:
 
 After this rule will be added, you can easily open Jira issue (`DO-1` in this sample) in one of Jira teams just typing `g jDO-1` or even `g jDO-1` in location bar.
 
-# How to build
+# How to Build
 At this moment, a build process is not automated and consists of the following manual steps:
 
 1. Download necessary libraries into the "./libs" folder:
@@ -93,3 +93,7 @@ http -d https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js
 zip url-alias-assistant-plugin.zip *.js *.json logo96.png logo48.png *.html libs/*
 ```
 3. Submit archive as a new version to [Google Webstore](https://chrome.google.com/webstore/developer/dashboard) and [Mozilla Developer Hub](https://addons.mozilla.org/en-US/developers/addons).
+
+# Obtain Latest Version
+Go to [Firefox Add-ons Site](https://addons.mozilla.org/en-US/firefox/addon/url-alias-assistant/) or [Chrome Web Store](https://chrome.google.com/webstore/detail/url-alias-assistant/mphkengpjhplgaenijfjiagldcnmndeb) to check the latest version and related info.
+
